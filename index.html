@@ -1118,9 +1118,14 @@
     if (bm) {
       var bmLabel = bm.textContent;
       bm.addEventListener("click", function () {
-        var mac = /Mac|iPhone|iPad/.test(navigator.platform);
-        bm.textContent = mac ? "Press ⌘ D" : "Press Ctrl+D";
-        setTimeout(function () { bm.textContent = bmLabel; }, 2500);
+        var isMobile = window.matchMedia("(pointer: coarse)").matches;
+        if (isMobile && navigator.share) {
+          navigator.share({ title: document.title, url: window.location.href }).catch(function () {});
+        } else {
+          var mac = /Mac/.test(navigator.platform);
+          bm.textContent = mac ? "Press ⌘ D" : "Press Ctrl+D";
+          setTimeout(function () { bm.textContent = bmLabel; }, 2500);
+        }
       });
     }
 

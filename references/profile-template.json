@@ -1,0 +1,50 @@
+{
+  "_comment": "Your standing application profile. Onboarding writes a filled copy to user-library/profile.json. It holds your contact identity, links, and the standard answers nearly every application form asks for, so the browser auto-fill module can complete them without re-interviewing you each time. No role-specific content lives here.",
+
+  "name": "",
+  "email": "",
+  "phone": "",
+  "location": "",
+  "website": "",
+  "website_url": "",
+
+  "links": {
+    "linkedin": "",
+    "portfolio": "",
+    "github": "",
+    "other": ""
+  },
+
+  "work_authorization": {
+    "authorized_to_work_in_country": "",
+    "requires_sponsorship": null,
+    "notes": ""
+  },
+
+  "compensation": {
+    "target": null,
+    "floor": null,
+    "currency": "USD",
+    "notes": "What to put when a form demands a number. Leave a range or 'open' if you prefer not to anchor."
+  },
+
+  "standard_form_answers": {
+    "_comment": "Verbatim answers to the recurring single-value questions on application forms. Fill what applies; leave blanks for ones you'd rather answer per-application.",
+    "how_did_you_hear": "",
+    "earliest_start_date": "",
+    "willing_to_relocate": null,
+    "remote_preference": "",
+    "pronouns": "",
+    "gender": "",
+    "race_ethnicity": "",
+    "veteran_status": "",
+    "disability_status": "",
+    "require_visa_now_or_future": null,
+    "previously_employed_here": null
+  },
+
+  "library_enrichment": {
+    "_comment": "How the kit handles new true facts about you that surface during a run (a real metric you mention, a story not yet in the fact pack, a refined role preference). 'confirm' (default) asks before saving anything. 'silent' lets the kit auto-save clearly-true additions without asking, and only checks in on ambiguous ones. Either way it NEVER invents or infers a fact you didn't actually state.",
+    "mode": "confirm"
+  }
+}

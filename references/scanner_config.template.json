@@ -1,0 +1,103 @@
+{
+  "_comment": "Job scanner config TEMPLATE. Copy to user-library/scanner_config.json and fill in your own criteria during onboarding. TWO source kinds: (1) discovery_sources = BROAD market discovery across keyless remote-job aggregators (surfaces roles at companies you never pre-listed); (2) an OPTIONAL per-company ATS watchlist ('always also check these'). The 'criteria' block is the shared scoring/filtering brain. EVERYTHING below is an EXAMPLE with sensible defaults — the tier/keyword/watchlist lists are examples, NOT a fixed whitelist; trim or extend freely. No personal data is baked into the script; it all lives here.",
+
+  "discovery_sources": {
+    "remotive": {
+      "enabled": true,
+      "_note": "https://remotive.com/api/remote-jobs?search=<query>. One fetch per query. Free-text search is loose, so the role-title regex does the real precision work downstream.",
+      "queries": ["REPLACE - e.g. product designer", "design"]
+    },
+    "remoteok": {
+      "enabled": true,
+      "_note": "https://remoteok.com/api — single endpoint, no query param. Returns the latest ~100 jobs across all categories; the role-title regex filters to your roles."
+    },
+    "arbeitnow": {
+      "enabled": true,
+      "_note": "https://www.arbeitnow.com/api/job-board-api — single endpoint. Europe-heavy; most rows drop on the US-location gate, but it occasionally surfaces remote-US startup roles."
+    },
+    "jobicy": {
+      "enabled": true,
+      "_note": "https://jobicy.com/api/v2/remote-jobs?count=<count>&tag=<tag>. One fetch per tag. Remote-only board.",
+      "count": 50,
+      "tags": ["REPLACE - e.g. product designer", "designer"]
+    }
+  },
+
+  "adzuna": {
+    "enabled": false,
+    "_note": "OPTIONAL. Needs a free Adzuna API key (app_id + app_key from developer.adzuna.com). When enabled AND keys are set, queries the US jobs endpoint with max_days_old. When disabled, skipped silently. Adzuna salaries are often PREDICTED estimates, not employer-stated — the script ignores predicted figures so they can't trip the sub-floor drop.",
+    "app_id": "",
+    "app_key": "",
+    "max_days_old": 2,
+    "queries": ["REPLACE - e.g. product designer"]
+  },
+
+  "watchlist_enabled": false,
+  "_watchlist_comment": "OPTIONAL supplement — specific company boards to ALSO check on top of broad discovery. Set watchlist_enabled=true to use it. ats is greenhouse|lever|ashby; token is the board slug in the API URL (Ashby tokens are CASE-SENSITIVE). Verify a token resolves before trusting it (e.g. curl 'https://boards-api.greenhouse.io/v1/boards/TOKEN/jobs?content=false'). These three are EXAMPLES ONLY — replace with companies you care about.",
+  "watchlist": [
+    { "company": "EXAMPLE - Acme",        "ats": "greenhouse", "token": "acme",     "note": "REPLACE - example only: a real Greenhouse board slug" },
+    { "company": "EXAMPLE - Globex",      "ats": "ashby",      "token": "Globex",   "note": "REPLACE - example only: a real Ashby board slug (case-sensitive)" },
+    { "company": "EXAMPLE - Initech",     "ats": "lever",      "token": "initech",  "note": "REPLACE - example only: a real Lever board slug" }
+  ],
+
+  "criteria": {
+    "_comment": "The scoring/filtering brain. role_title_regex (if set) is the precise title gate; role_keywords/levels are the simpler fallback. levels are listed MOST-PREFERRED FIRST. locations are acceptable location substrings; home_terms get the top location score. Comp is annual USD. Replace every REPLACE with your own search.",
+
+    "role_keywords": ["REPLACE - e.g. product designer", "product design", "design"],
+    "levels": ["principal", "staff", "lead", "senior"],
+    "require_level": false,
+    "role_title_regex": "REPLACE-OPTIONAL - a precise title gate, e.g. (senior|staff|principal|lead|director).*(product design|design)|(product )?design (lead|manager)|head of (product )?design",
+    "_role_title_regex_note": "OPTIONAL. When set, this regex is the role-title gate (more precise than role_keywords). When empty/removed, the scanner falls back to role_keywords (+levels if require_level is true). Leave the REPLACE string and it simply won't compile to anything useful — set a real regex or delete the key to use the fallback.",
+
+    "locations": ["United States", "Remote US", "REPLACE - e.g. Your City", "REPLACE - e.g. ST"],
+    "home_terms": ["REPLACE - e.g. your city", "REPLACE - e.g. your state abbrev"],
+    "us_only": true,
+    "require_remote_or_home": false,
+    "_require_remote_or_home_note": "When true, drops roles that are neither remote/worldwide NOR in your home_terms (i.e. onsite-elsewhere). Leave false to keep any US-acceptable location.",
+
+    "max_age_days": 14,
+    "_max_age_note": "RECENCY GATE. Drops postings older than this many days ONLY for sources that expose a post/updated date (remoteok, remotive, jobicy, greenhouse, lever, ashby, arbeitnow, adzuna). Rows where the source gives NO parseable date are KEPT (benefit of the doubt, same as unknown-comp rows). Set to 0 or null to disable. Robust to messy/missing date formats: a bad date is treated as 'no date' and the row is kept.",
+
+    "comp_target": 0,
+    "comp_floor": 0,
+    "_comp_note": "comp_target = the number that earns full comp points; comp_floor = the number below which an EXPLICITLY-listed sub-floor role is DROPPED. Unknown-comp rows are always KEPT (they just get no comp boost). Set both to 0 to ignore comp entirely. Defaults assume annual USD (see accept_currencies / comp_band below to scan in another currency).",
+    "accept_currencies": ["USD"],
+    "comp_band": [40000, 1000000],
+    "_currency_note": "NON-US USERS set these. accept_currencies = currency codes/symbols a salary must be in to be trusted as comp (a figure in any other currency is ignored, never mis-ranked as USD). comp_band = [min, max] plausible ANNUAL figure in that currency, so an hourly/monthly number isn't mistaken for salary — widen it for high-denomination currencies (e.g. INR/JPY). Leave as [\"USD\"] + [40000, 1000000] for a US search.",
+    "allow_unleveled_if_comp_ok": false,
+    "_allow_unleveled_note": "When true, a bare role title with NO level word (e.g. plain 'Product Designer') still passes the role gate IF it lists comp_max >= comp_floor (comp acts as the seniority proxy). Bare-title roles with unknown or sub-floor comp are dropped. Leveled roles always pass regardless of comp. Requires a real comp_floor to be useful.",
+
+    "signal_keywords": ["REPLACE - e.g. design system", "experimentation", "growth", "AI"],
+    "_signal_note": "Generic role-fit signals, +8 each (cap 30). Use these for skills/themes that make a role a good fit but aren't the role's SHAPE or DOMAIN.",
+
+    "shape_signals": [
+      "founding", "founding member", "founding team",
+      "first hire", "first in", "sole", "only",
+      "team of one", "department of one", "0 to 1", "0-1", "zero to one", "zero-to-one",
+      "generalist", "broad scope", "end-to-end ownership", "end to end",
+      "wear many hats", "build the function", "build the team",
+      "establish the", "stand up the", "shape the", "define the",
+      "REPLACE - add YOUR role's shape phrases, e.g. design: 'first design hire' / 'founding designer' / 'sole designer'; eng: 'founding engineer' / 'first backend hire'; PM: 'first PM' / 'founding product manager'; sales: 'first sales hire' / 'founding AE'; nursing: 'charge nurse' / 'unit lead'"
+    ],
+    "shape_signal_points": 14,
+    "shape_signal_cap": 24,
+    "shape_baseline_points": 12,
+    "_shape_note": "ROLE-SHAPE handling — works for ANY profession. shape_signals describe a role's SHAPE independent of domain (founding / first-hire / 0->1 / team-of-one / generalist breadth). The entries above are role-NEUTRAL and already generalize; the REPLACE line is where you add the phrases specific to YOUR field (design: 'first design hire'; engineering: 'founding engineer'; PM: 'first product manager'; marketing/sales: 'first sales hire', etc.) — onboarding should rewrite that slot to your role and remove this instruction string. Each card-text hit is worth shape_signal_points (14, vs 8 for a generic signal), capped at shape_signal_cap (24). SEPARATELY, shape_baseline_points (12) is added to ANY role whose shape is your sweet spot — a leveled IC, in an acceptable location, with comp not sub-floor (unknown comp gets benefit of the doubt) — even with NO shape_signal text and NO domain match. That baseline is the 'thin-card but right-shape' deep-read trigger: a browser card with a thin description still surfaces on level+location+comp alone, where the full JD makes the real call. Set shape_baseline_points to 0 to disable the baseline. Downweighted manager-only roles never get the baseline (it is IC-shaped only).",
+
+    "tier1_keywords": ["REPLACE - your top-priority domains, e.g. travel, design tool, creator tool, no-code"],
+    "tier2_keywords": ["REPLACE - your nice-to-have domains, e.g. climate, developer tools, personal finance"],
+    "bonus_keywords": ["REPLACE - optional extra mission keywords you care about"],
+    "_tier_note": "DOMAIN IS NON-EXHAUSTIVE / BENEFIT-OF-THE-DOUBT. The tier lists are a curated BONUS, not a gate: a Tier-1 match adds +18, a Tier-2 (or bonus) match adds +9, and NO match is NEUTRAL (no penalty). An unlisted domain is NEVER on its own a reason to keep a strong-fit role under the deep-read bar — only exclude_keywords actually drop a domain. Keep these lists short and meaningful; you don't need to enumerate every acceptable domain.",
+
+    "exclude_keywords": ["REPLACE - hard-no domains, e.g. crypto, gambling, defense"],
+    "_exclude_note": "The ONLY domain hard-no. Any posting whose title/description/company contains one of these is DROPPED before scoring. This is the one place a domain can disqualify a role; everything else is non-exhaustive bonus.",
+
+    "manager_player_coach_cues": ["player/coach", "player-coach", "hands-on", "individual contributor", "still design", "roll up your sleeves", "0 to 1"],
+    "_manager_note": "Manager/Head-of/Director titles are downweighted (-12) UNLESS one of these player/coach cues is present (signaling the role still does hands-on IC design). Manager-only roles never get the IC right-shape baseline.",
+
+    "result_cap": 8,
+
+    "deep_read_threshold": 50,
+    "_deep_read_note": "TWO-STAGE SCORING. Stage 1 = the cheap card/listing-level score this script computes for EVERY discovered role — enough to rule out the ~half that are obvious comp or domain mismatches. Stage 2 (done by the AGENT, not this script) = for any role whose card score is GREATER THAN deep_read_threshold (50), open and fetch the FULL JD, extract real comp + scope, do a live-status check, and re-score before recommending. Do NOT deep-read everything — only the cards already promising enough to be worth the closer look. The shortlist marks each item deep_read=true/false on this threshold. Raise it to deep-read fewer cards; lower it to deep-read more borderline ones."
+  }
+}

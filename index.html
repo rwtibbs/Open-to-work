@@ -668,6 +668,71 @@
     cursor: pointer;
   }
 
+  /* ---------- seed prompts ---------- */
+
+  .prompts-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--line-strong);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .prompts-tabs::-webkit-scrollbar { display: none; }
+
+  .prompt-tab {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--faint);
+    padding: 16px 24px 15px;
+    cursor: pointer;
+    white-space: nowrap;
+    margin-bottom: -1px;
+    transition: color 150ms ease-out, border-color 150ms ease-out;
+  }
+  .prompt-tab:hover { color: var(--text); }
+  .prompt-tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+
+  .prompt-panel { display: none; }
+  .prompt-panel.is-active { display: block; animation: promptIn 200ms ease-out; }
+
+  @keyframes promptIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .prompt-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line-strong);
+    border-top: none;
+  }
+
+  .prompt-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    background: var(--bg-raised);
+    padding: 20px 24px;
+  }
+
+  .prompt-text {
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.65;
+    color: var(--text);
+    flex: 1;
+  }
+
+  .prompt-hint { color: var(--faint); }
+
   /* ---------- footer ---------- */
 
   footer {
@@ -750,6 +815,13 @@
     .install-option { margin-bottom: 44px; }
     .wt-step { grid-template-columns: 1fr; gap: 8px; }
     .walkthrough { margin: 56px 0 44px; }
+    .prompt-tab { padding: 14px 16px 13px; }
+    .prompt-row { padding: 16px 18px; gap: 16px; }
+    .prompt-text { font-size: 13px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .prompt-panel.is-active { animation: none; }
   }
 </style>
 </head>
@@ -861,6 +933,91 @@
           </div>
         </details>
         <p class="tool-mode">Optional · bring your own transcript</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- seed prompts -->
+  <section id="seed-prompts" aria-label="Example prompts">
+    <div class="wrap">
+      <p class="kicker" data-reveal>In practice</p>
+      <h2 data-reveal>What to <em>say.</em></h2>
+
+      <div class="prompts" data-reveal>
+        <div class="prompts-tabs" role="tablist" aria-label="Prompt categories">
+          <button class="prompt-tab" role="tab" aria-selected="true"  aria-controls="prompts-find"      id="tab-find"      tabindex="0">Find jobs</button>
+          <button class="prompt-tab" role="tab" aria-selected="false" aria-controls="prompts-apply"     id="tab-apply"     tabindex="-1">Apply</button>
+          <button class="prompt-tab" role="tab" aria-selected="false" aria-controls="prompts-reach"     id="tab-reach"     tabindex="-1">Reach out</button>
+          <button class="prompt-tab" role="tab" aria-selected="false" aria-controls="prompts-interview" id="tab-interview" tabindex="-1">Interview</button>
+        </div>
+
+        <div id="prompts-find" class="prompt-panel is-active" role="tabpanel" aria-labelledby="tab-find">
+          <ul class="prompt-list">
+            <li class="prompt-row">
+              <span class="prompt-text">Find me 5 new roles that fit my background and send them every morning at 9am.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+            <li class="prompt-row">
+              <span class="prompt-text">Find senior product design roles, remote, $160k+, at Series A companies with 50–150 employees that genuinely value design craft.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+            <li class="prompt-row">
+              <span class="prompt-text">What new jobs came up since yesterday? Rank them by how well they fit me.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+          </ul>
+        </div>
+
+        <div id="prompts-apply" class="prompt-panel" role="tabpanel" aria-labelledby="tab-apply">
+          <ul class="prompt-list">
+            <li class="prompt-row">
+              <span class="prompt-text">Tailor my resume to this role and tell me my ATS score. <span class="prompt-hint">[paste the job posting]</span></span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+            <li class="prompt-row">
+              <span class="prompt-text">Write a cover letter for this job in my voice, and answer their application questions.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+            <li class="prompt-row">
+              <span class="prompt-text">Fill out this application for me, but stop before submitting so I can review it. <span class="prompt-hint">[paste the URL]</span></span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+          </ul>
+        </div>
+
+        <div id="prompts-reach" class="prompt-panel" role="tabpanel" aria-labelledby="tab-reach">
+          <ul class="prompt-list">
+            <li class="prompt-row">
+              <span class="prompt-text">Find the hiring manager for this role and draft a short, personal note to them.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+            <li class="prompt-row">
+              <span class="prompt-text">Help me find the recruiter's email and write an intro that mentions my background.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+            <li class="prompt-row">
+              <span class="prompt-text">Draft a LinkedIn message to someone on this team — keep it genuine, not salesy.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+          </ul>
+        </div>
+
+        <div id="prompts-interview" class="prompt-panel" role="tabpanel" aria-labelledby="tab-interview">
+          <ul class="prompt-list">
+            <li class="prompt-row">
+              <span class="prompt-text">I have an interview for this role next week. Build me a prep kit and run a mock interview.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+            <li class="prompt-row">
+              <span class="prompt-text">Draft a thank-you note for the interview I just had with <span class="prompt-hint">[name]</span>.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+            <li class="prompt-row">
+              <span class="prompt-text">I got an offer. Help me think through a counter.</span>
+              <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -1145,6 +1302,34 @@
         }
       });
     }
+
+    // seed prompt tabs + copy
+    var promptTabs = Array.prototype.slice.call(document.querySelectorAll(".prompt-tab"));
+    function activatePromptTab(tab) {
+      promptTabs.forEach(function (t) { t.setAttribute("aria-selected", "false"); t.setAttribute("tabindex", "-1"); });
+      document.querySelectorAll(".prompt-panel").forEach(function (p) { p.classList.remove("is-active"); });
+      tab.setAttribute("aria-selected", "true");
+      tab.setAttribute("tabindex", "0");
+      document.getElementById(tab.getAttribute("aria-controls")).classList.add("is-active");
+    }
+    promptTabs.forEach(function (tab, i) {
+      tab.addEventListener("click", function () { activatePromptTab(tab); });
+      tab.addEventListener("keydown", function (e) {
+        var next;
+        if (e.key === "ArrowRight") next = promptTabs[(i + 1) % promptTabs.length];
+        if (e.key === "ArrowLeft")  next = promptTabs[(i - 1 + promptTabs.length) % promptTabs.length];
+        if (next) { next.focus(); activatePromptTab(next); }
+      });
+    });
+    document.querySelectorAll(".prompt-copy").forEach(function (copyBtn) {
+      copyBtn.addEventListener("click", function () {
+        var text = copyBtn.closest(".prompt-row").querySelector(".prompt-text").textContent.trim();
+        navigator.clipboard.writeText(text).then(function () {
+          copyBtn.textContent = "Copied";
+          setTimeout(function () { copyBtn.textContent = "Copy"; }, 1600);
+        });
+      });
+    });
 
     // copy install command
     var btn = document.getElementById("copy-btn");

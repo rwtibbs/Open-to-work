@@ -33,10 +33,12 @@
     --accent: #FFA028;
     --accent-down: #E08812;
     --accent-ink: #181106;
-    --available: #5BB85A; /* LinkedIn "open to work" green — used once, on the wordmark dot */
+    --available: #5BB85A;
     --display: "Barlow Condensed", "Arial Narrow", sans-serif;
     --body: "Atkinson Hyperlegible", "Helvetica Neue", sans-serif;
     --mono: "JetBrains Mono", "SFMono-Regular", Consolas, monospace;
+    --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -100,6 +102,12 @@
     background: var(--available);
     margin-right: 9px;
     vertical-align: 0.08em;
+    animation: dotPulse 2.8s var(--ease-out-quint) infinite;
+  }
+
+  @keyframes dotPulse {
+    0%, 100% { box-shadow: 0 0 0 0 oklch(58% 0.14 142 / 0.45); }
+    50%       { box-shadow: 0 0 0 5px oklch(58% 0.14 142 / 0); }
   }
 
   .header-link {
@@ -183,9 +191,9 @@
   .btn-primary {
     background: var(--accent);
     color: var(--accent-ink);
-    transition: background-color 150ms ease-out;
+    transition: background-color 150ms ease-out, transform 200ms var(--ease-out-quint);
   }
-  .btn-primary:hover { background: var(--accent-down); }
+  .btn-primary:hover { background: var(--accent-down); transform: scale(1.025); }
 
   .btn-ghost {
     border-color: var(--line-strong);
@@ -220,6 +228,7 @@
   h2 em {
     font-style: italic;
     font-weight: 800;
+    color: var(--accent);
   }
 
   /* ---------- the loop ---------- */
@@ -268,9 +277,10 @@
     margin: -40px 0 88px;
   }
 
-  .tool { max-width: 660px; margin-bottom: 110px; }
+  .tool { max-width: 660px; margin-bottom: 110px; transition: transform 350ms var(--ease-out-quint); }
   .tools .tool:nth-of-type(even) { margin-left: auto; }
   .tool:last-child { margin-bottom: 0; }
+  .tool:hover { transform: translateY(-5px); }
 
   .tool-num {
     font-family: var(--mono);
@@ -382,8 +392,9 @@
 
   .honesty {
     margin-top: 88px;
-    padding-left: 28px;
-    border-left: 2px solid var(--line-strong);
+    padding: 36px 40px;
+    border: 1px solid var(--line-strong);
+    background: var(--bg-raised);
     max-width: 60ch;
   }
 
@@ -703,16 +714,16 @@
     cursor: pointer;
     white-space: nowrap;
     margin-bottom: -1px;
-    transition: color 150ms ease-out, border-color 150ms ease-out;
+    transition: color 180ms var(--ease-out-quint), border-color 180ms var(--ease-out-quint);
   }
   .prompt-tab:hover { color: var(--text); }
   .prompt-tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
 
   .prompt-panel { display: none; }
-  .prompt-panel.is-active { display: block; animation: promptIn 200ms ease-out; }
+  .prompt-panel.is-active { display: block; animation: promptIn 300ms var(--ease-out-quint); }
 
   @keyframes promptIn {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
@@ -781,15 +792,15 @@
 
   .fade-up {
     opacity: 0;
-    transform: translateY(14px);
-    animation: fadeUp 700ms ease-out forwards;
+    transform: translateY(22px);
+    animation: fadeUp 780ms var(--ease-out-quint) forwards;
   }
   .fade-up:nth-child(1) { animation-delay: 60ms; }
-  .fade-up:nth-child(2) { animation-delay: 160ms; }
-  .fade-up:nth-child(3) { animation-delay: 260ms; }
-  .fade-up:nth-child(4) { animation-delay: 360ms; }
-  .fade-up:nth-child(5) { animation-delay: 460ms; }
-  .fade-up:nth-child(6) { animation-delay: 560ms; }
+  .fade-up:nth-child(2) { animation-delay: 170ms; }
+  .fade-up:nth-child(3) { animation-delay: 280ms; }
+  .fade-up:nth-child(4) { animation-delay: 390ms; }
+  .fade-up:nth-child(5) { animation-delay: 500ms; }
+  .fade-up:nth-child(6) { animation-delay: 610ms; }
 
   @keyframes fadeUp {
     to { opacity: 1; transform: translateY(0); }
@@ -797,8 +808,8 @@
 
   [data-reveal] {
     opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 500ms ease-out, transform 500ms ease-out;
+    transform: translateY(28px);
+    transition: opacity 640ms var(--ease-out-quint), transform 640ms var(--ease-out-quint);
   }
   [data-reveal].is-visible {
     opacity: 1;
@@ -809,6 +820,9 @@
     html { scroll-behavior: auto; }
     .fade-up { animation: none; opacity: 1; transform: none; }
     [data-reveal] { opacity: 1; transform: none; transition: none; }
+    .wordmark::before { animation: none; }
+    .tool { transition: none; }
+    .btn-primary { transition: background-color 150ms ease-out; }
   }
 
   /* ---------- responsive ---------- */

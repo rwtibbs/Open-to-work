@@ -252,10 +252,11 @@
   }
 
   .loop-line {
-    font-size: 21px;
-    line-height: 1.55;
-    max-width: 34em;
-    margin-top: 64px;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    color: var(--faint);
+    margin-top: 8px;
   }
 
   /* ---------- the four tools ---------- */
@@ -819,7 +820,7 @@
     h2 { margin-bottom: 44px; }
     .tool { margin-bottom: 72px; }
     .tools .tool:nth-of-type(even) { margin-left: 0; }
-    .loop-line { margin-top: 44px; }
+    .loop-line { margin-top: 6px; }
     .lede { margin: -28px 0 64px; }
     .beat { grid-template-columns: 1fr; gap: 10px; padding: 26px 0; }
     .tips { grid-template-columns: 1fr; }
@@ -858,13 +859,13 @@
     <div class="wrap">
       <p class="hero-kicker fade-up">A free skill for Claude</p>
       <h1 class="fade-up">Open to&nbsp;work</h1>
-      <p class="hero-sub fade-up">Scans for roles twice a day, scores them, and surfaces a shortlist. Pick the ones worth your time — come back to finished applications, ready to review and send.</p>
+      <p class="hero-sub fade-up">Scans for roles twice a day, scores them, and surfaces a shortlist. Pick the ones worth your time. Come back to finished applications, ready to review and send.</p>
       <p class="hero-exhale fade-up">An AI screens your resume before any human sees it. Might as well have one working for you&nbsp;too.</p>
       <div class="hero-ctas fade-up">
         <a class="btn btn-primary" href="#get-started">Install the skill</a>
         <a class="btn btn-ghost" href="https://github.com/rwtibbs/Open-to-work">View on GitHub</a>
       </div>
-      <p class="hero-env fade-up">Runs in Claude Cowork or Claude Code — needs real files and a persistent folder, not a chat window.</p>
+      <p class="hero-env fade-up">Runs in Claude Cowork or Claude Code. Needs real files and a persistent folder, not a chat window.</p>
     </div>
   </section>
 
@@ -875,9 +876,8 @@
       <h2 data-reveal>Runs itself. Stops at <em>send.</em></h2>
 
       <p class="loop-flow" data-reveal>Scan <span class="loop-arrow">→</span> Shortlist <span class="loop-arrow">→</span> Tailor&nbsp;&amp;&nbsp;apply <span class="loop-arrow">→</span> Reach&nbsp;out <span class="loop-arrow">→</span> Prep <span class="loop-arrow">→</span> Follow&nbsp;up&nbsp;<span class="loop-arrow">↻</span></p>
-      <p class="loop-note" data-reveal>Twice a day, or your cadence — nothing sends without your review.</p>
-
-      <p class="loop-line" data-reveal>Run it hands-free — or open any stage and drive it yourself.</p>
+      <p class="loop-note" data-reveal>Twice a day, or your cadence. Nothing sends without your review.</p>
+      <p class="loop-line" data-reveal>Runs hands-free. Open any stage to take over.</p>
     </div>
   </section>
 
@@ -891,8 +891,8 @@
           <p class="tool-num">01</p>
           <h3 class="tool-name">Scan &amp; match</h3>
           <p class="tool-prop">Jobs that fit you, delivered twice a day.</p>
-          <p class="tool-desc">Scans job boards, LinkedIn, and Wellfound on a schedule, scores every new posting against your criteria — level, location, comp, hard-nos — and returns a ranked shortlist.</p>
-          <p class="tool-mode">In the loop · or on its own — Chrome extension for the LinkedIn / Wellfound pass</p>
+          <p class="tool-desc">Scans job boards, LinkedIn, and Wellfound on a schedule, scores every new posting against your criteria (level, location, comp, hard-nos), and returns a ranked shortlist.</p>
+          <p class="tool-mode">In the loop · or on its own (Chrome extension for the LinkedIn / Wellfound pass)</p>
         </article>
 
         <article class="tool" data-reveal>
@@ -900,14 +900,14 @@
           <h3 class="tool-name">Tailor &amp; apply</h3>
           <p class="tool-prop">A truthful, ATS-ready application for any role.</p>
           <p class="tool-desc">Reads the job, tailors a one-page resume (DOCX and PDF), runs the ATS scoring loop, writes a cover letter in your voice, and answers open-ended questions. Stops before Submit.</p>
-          <p class="tool-mode">In the loop · or on its own — zero setup, no extension required</p>
+          <p class="tool-mode">In the loop · or on its own (zero setup, no extension required)</p>
         </article>
 
         <article class="tool" data-reveal>
           <p class="tool-num">03</p>
           <h3 class="tool-name">Reach out</h3>
           <p class="tool-prop">A personal note to the human, on the roles you actually want.</p>
-          <p class="tool-desc">Finds the recruiter or hiring manager, helps you get their contact, and drafts a short note in your voice — email or LinkedIn. You press send.</p>
+          <p class="tool-desc">Finds the recruiter or hiring manager, helps you get their contact, and drafts a short note in your voice, by email or on LinkedIn. You press send.</p>
           <p class="tool-mode">In the loop · or on its own</p>
         </article>
 
@@ -915,8 +915,8 @@
           <p class="tool-num">04</p>
           <h3 class="tool-name">Interview &amp; beyond</h3>
           <p class="tool-prop">With you from the interview to the offer.</p>
-          <p class="tool-desc">Builds a tailored prep kit — strengths, gaps, and stories mapped to likely questions — then runs a live mock interview with feedback. Afterward it drafts the thank-you in your voice, specific to that conversation, and nudges politely when a role goes quiet — and when an offer lands, it helps you think through the counter.</p>
-          <p class="tool-mode">In the loop · or on its own — bring any role</p>
+          <p class="tool-desc">Builds a tailored prep kit (strengths, gaps, and stories mapped to likely questions), then runs a live mock interview with feedback. Afterward it drafts the thank-you in your voice, specific to that conversation, nudges politely when a role goes quiet, and helps you think through the counter when an offer lands.</p>
+          <p class="tool-mode">In the loop · or on its own (bring any role)</p>
         </article>
       </div>
     </div>
@@ -927,7 +927,7 @@
     <div class="wrap">
       <div class="addon" data-reveal>
         <h3 class="addon-name">Learn from your real interviews</h3>
-        <p class="tool-desc">After a real interview, hand it a transcript — it grades how you did against the prep kit it built and feeds the takeaways back into your library.</p>
+        <p class="tool-desc">After a real interview, hand it a transcript; it grades how you did against the prep kit it built and feeds the takeaways back into your library.</p>
         <details class="addon-howto fold">
           <summary>How to set it up</summary>
           <div>
@@ -937,7 +937,7 @@
             </div>
             <div class="howto-step">
               <p class="howto-num">02</p>
-              <p>Record the interview. Check local law — some places require consent from everyone on the call.</p>
+              <p>Record the interview. Check local law: some places require consent from everyone on the call.</p>
             </div>
             <div class="howto-step">
               <p class="howto-num">03</p>
@@ -959,7 +959,7 @@
     <div class="wrap">
       <p class="kicker" data-reveal>In practice</p>
       <h2 data-reveal>Start <em>anywhere.</em></h2>
-      <p class="prompts-intro" data-reveal>A few starting prompts — use them as-is, or let them spark your own.</p>
+      <p class="prompts-intro" data-reveal>A few starting prompts. Use them as-is, or let them spark your own.</p>
 
       <div class="prompts" data-reveal>
         <div class="prompts-tabs" role="tablist" aria-label="Prompt categories">
@@ -1014,7 +1014,7 @@
               <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
             </li>
             <li class="prompt-row">
-              <span class="prompt-text">Draft a LinkedIn message to someone on this team — keep it genuine, not salesy.</span>
+              <span class="prompt-text">Draft a LinkedIn message to someone on this team. Keep it genuine, not salesy.</span>
               <button class="copy-btn prompt-copy" type="button" aria-label="Copy prompt">Copy</button>
             </li>
           </ul>
@@ -1046,12 +1046,12 @@
       <p class="kicker" data-reveal>03 / One shared library</p>
       <h2 data-reveal>One <em>library.</em></h2>
 
-      <p class="through" data-reveal>Every tool draws on the same library — your background, captured once at onboarding, sharpened every time any tool runs. Each tool makes the others smarter.</p>
+      <p class=”through” data-reveal>Every tool draws on the same library: your background, captured once at onboarding, sharpened every time any tool runs. Each tool makes the others smarter.</p>
 
-      <p class="through" data-reveal>The library remembers who you are; a running ledger remembers where every application stands — what you’ve applied to, who you’ve reached out to, what’s scheduled, and what you’re still waiting on. Ask “what’s still open?” or “who do I owe a follow-up?” and you get a real answer instead of a dig through your inbox. It keeps itself current as you go — every application, outreach note, and interview lands there automatically.</p>
+      <p class=”through” data-reveal>The library remembers who you are; a running ledger tracks where every application stands: what you’ve applied to, who you’ve reached out to, what’s scheduled, and what you’re still waiting on. Ask “what’s still open?” or “who do I owe a follow-up?” and you get a real answer instead of a dig through your inbox. Every application, outreach note, and interview lands there automatically.</p>
 
-      <div class="honesty" data-reveal>
-        <p>It tailors, reaches out, and answers using only your real experience. It will never invent a job, a metric, or a passion you don’t have — a higher score built on a lie collapses in the interview.</p>
+      <div class=”honesty” data-reveal>
+        <p>It tailors, reaches out, and answers using only your real experience. It will never invent a job, a metric, or a passion you don’t have. A higher score built on a lie collapses in the interview.</p>
       </div>
     </div>
   </section>
@@ -1065,11 +1065,11 @@
       <div class="beats">
         <div class="beat" data-reveal>
           <p class="beat-name">Set up once · 5–20 min</p>
-          <p>Upload a resume or take a guided interview. Your library — profile, resume, fact pack, voice — goes into <code>user-library/</code> on your machine. Then set your search: roles, levels, locations, comp floor, hard-nos. New to all this? There’s a <a class="repo-link" href="#get-started">walkthrough below</a>.</p>
+          <p>Upload a resume or take a guided interview. Your library (profile, resume, fact pack, voice) goes into <code>user-library/</code> on your machine. Then set your search: roles, levels, locations, comp floor, hard-nos. New to all this? There’s a <a class="repo-link" href="#get-started">walkthrough below</a>.</p>
         </div>
         <div class="beat" data-reveal>
           <p class="beat-name">Then it runs itself</p>
-          <p>Set a schedule — twice a day or whatever suits — and it scans, scores, and surfaces a shortlist. Pick one; it builds the full application package — resume, cover letter, answers. Or call any tool directly: “prep me for this interview” is a complete request.</p>
+          <p>Set a schedule (twice a day or whatever suits) and it scans, scores, and surfaces a shortlist. Pick one; it builds the full application package: resume, cover letter, answers. Or call any tool directly: “prep me for this interview” is a complete request.</p>
         </div>
         <div class="beat" data-reveal>
           <p class="beat-name">Review and send</p>
@@ -1087,12 +1087,12 @@
       <p class="kicker" data-reveal>05 / Getting the most out of it</p>
       <h2 data-reveal>Make it <em>yours.</em></h2>
 
-      <p class="through" data-reveal>Quality in, quality out. The output reflects what you put in — and your real experience and judgment are what earn interviews. This just makes sure they show up.</p>
+      <p class="through" data-reveal>Quality in, quality out. The output reflects what you put in, but your real experience and judgment are what earn interviews. This just makes sure they show up.</p>
 
       <div class="tips" data-reveal>
         <div class="tip">
           <span class="tip-label">Onboard thoroughly</span>
-          <p>The more detail you give at setup — real metrics, real stories, honest gaps — the less generic every output will be.</p>
+          <p>The more detail you give at setup (real metrics, real stories, honest gaps), the less generic every output will be.</p>
         </div>
         <div class="tip">
           <span class="tip-label">Calibrate early</span>
@@ -1100,7 +1100,7 @@
         </div>
         <div class="tip">
           <span class="tip-label">Keep the library current</span>
-          <p>New role, new metric, a story that landed well in an interview — add it. Every update makes the next application sharper.</p>
+          <p>New role, new metric, a story that landed well in an interview: add it. Every update makes the next application sharper.</p>
         </div>
         <div class="tip">
           <span class="tip-label">Review before you send</span>
@@ -1118,7 +1118,7 @@
 
       <div class="env-intro" data-reveal>
         <p class="option-label">First · where it runs</p>
-        <p>The full kit runs in <strong>Claude Cowork</strong> or <strong>Claude Code</strong> — that’s where Claude has a persistent folder and a shell.</p>
+        <p>The full kit runs in <strong>Claude Cowork</strong> or <strong>Claude Code</strong>; that’s where Claude has a persistent folder and a shell.</p>
         <p>Regular Claude chat has neither: nothing saves, no files come out.</p>
         <!-- PLACEHOLDER: swap [COWORK_URL] / [CLAUDE_CODE_URL] for the real landing pages -->
         <p class="env-defs">New to both? <a class="repo-link" href="[COWORK_URL]">Cowork</a> is Claude’s agentic desktop app. <a class="repo-link" href="[CLAUDE_CODE_URL]">Claude Code</a> is the terminal and IDE tool.</p>
@@ -1147,8 +1147,8 @@
 
       <div class="jar" data-reveal>
         <h3 class="jar-name">Why <em>free?</em></h3>
-        <p>The market is brutal enough. There’s a cottage industry selling expensive resume rewrites to people at their most vulnerable — this isn’t joining that pile.</p>
-        <p>So don’t tip on hope. Bookmark this page, run the thing, and if it actually gets you somewhere — the jar’s right here.</p>
+        <p>The market is brutal enough. There’s a cottage industry selling expensive resume rewrites to people at their most vulnerable. This isn’t joining that pile.</p>
+        <p>So don’t tip on hope. Bookmark this page, run the thing, and if it actually gets you somewhere, the jar’s right here.</p>
         <p class="jar-sig">From one unemployed tech worker to another.</p>
         <div class="jar-buttons">
           <a class="btn btn-ghost" href="https://ko-fi.com/rwtibbs/5" target="_blank" rel="noopener noreferrer">$5</a>
@@ -1169,7 +1169,7 @@
         <div class="wt-steps">
           <div class="wt-step">
             <p class="wt-name">01 · Get Claude</p>
-            <p>You need a Claude account — free plan works. Download the Claude desktop app. Enable code execution in Settings.</p>
+            <p>You need a Claude account (free plan works) running in Cowork or Claude Code — plain claude.ai chat can't run the skill. Download the Claude desktop app for Cowork. Enable code execution in Settings.</p>
           </div>
           <div class="wt-step">
             <p class="wt-name">02 · Add the skill</p>
@@ -1177,7 +1177,7 @@
           </div>
           <div class="wt-step">
             <p class="wt-name">03 · Or: Claude Code</p>
-            <p>If you prefer a terminal: a <code>.skill</code> file is a renamed zip — unzip into <code>~/.claude/skills/</code> and restart Claude Code, or use the command above.</p>
+            <p>If you prefer a terminal: a <code>.skill</code> file is a renamed zip. Unzip into <code>~/.claude/skills/</code> and restart Claude Code, or use the command above.</p>
           </div>
           <div class="wt-step">
             <p class="wt-name">04 · First run</p>
@@ -1191,7 +1191,7 @@
           <div class="wt-step">
             <p class="wt-name">06 · If something’s missing</p>
             <!-- VERIFY: confirm the skill actually checks for Python/python-docx/LibreOffice and guides setup -->
-            <p>Uses Python and LibreOffice under the hood — if something’s missing, the skill tells you and walks you through it.</p>
+            <p>Uses Python and LibreOffice under the hood. If something’s missing, the skill tells you and walks you through it.</p>
           </div>
           <!-- VERIFY: Dispatch claim — phone-paired tasks can invoke the skill on your desktop -->
           <p class="wt-tip">Pro tip: pair your phone via Dispatch (Claude Desktop → Cowork, Pro/Max plans) — the loop runs from your phone while your computer stays on.</p>
@@ -1215,19 +1215,19 @@
         </details>
         <details class="faq-item fold">
           <summary>Will it ever send anything without me?</summary>
-          <p>No. The browser fill stops before Submit. Outreach notes are drafted for you to send. Scheduled scans only read and rank postings — applying is always your move.</p>
+          <p>No. The browser fill stops before Submit. Outreach notes are drafted for you to send. Scheduled scans only read and rank postings; applying is always your move.</p>
         </details>
         <details class="faq-item fold">
           <summary>What does the ATS scoring loop actually do?</summary>
-          <p>After tailoring, it scores the resume against the posting — keywords, alignment, structure — implements the fixes, and scores again. Only implements what you can truthfully claim.</p>
+          <p>After tailoring, it scores the resume against the posting (keywords, alignment, structure), implements the fixes, and scores again. Only implements what you can truthfully claim.</p>
         </details>
         <details class="faq-item fold">
           <summary>Do I need Cowork or Claude Code? Can’t I just use it in a normal chat?</summary>
-          <p>The full thing needs Cowork or Claude Code — that’s where Claude has a persistent folder and shell. Regular chat has neither; nothing saves, no files come out.</p>
+          <p>The full thing needs Cowork or Claude Code; that’s where Claude has a persistent folder and shell. Regular chat has neither: nothing saves, no files come out.</p>
         </details>
         <details class="faq-item fold">
           <summary>Do I need the Chrome extension?</summary>
-          <p>Not required. Tailoring, outreach, and interview prep all work on install — paste a role and go. The extension (Claude in Chrome — paid, beta, Chrome only) unlocks the scanner and browser fill.</p>
+          <p>Not required. Tailoring, outreach, and interview prep all work on install. Paste a role and go. The extension (Claude in Chrome, paid, beta, Chrome only) unlocks the scanner and browser fill.</p>
         </details>
         <details class="faq-item fold">
           <summary>Can it run while I’m away from the computer?</summary>
@@ -1235,11 +1235,11 @@
         </details>
         <details class="faq-item fold">
           <summary>How does it learn from my interviews?</summary>
-          <p>Through the interview debrief. Hand it a transcript after a real interview — it grades how you did against the prep kit and feeds the takeaways into your library. Not turnkey: you set up a free on-device transcription tool and record your own calls.</p>
+          <p>Through the interview debrief. Hand it a transcript after a real interview; it grades how you did against the prep kit and feeds the takeaways into your library. Not turnkey: you set up a free on-device transcription tool and record your own calls.</p>
         </details>
         <details class="faq-item fold">
           <summary>What’s in <code>user-library/</code>, and can I edit it?</summary>
-          <p>Plain, readable files: profile, base resume, fact pack, voice, formatting preferences. Open them, edit them, delete them — it’s your folder. The tools read from it and write to it as you use them.</p>
+          <p>Plain, readable files: profile, base resume, fact pack, voice, formatting preferences. Open them, edit them, delete them. It’s your folder. The tools read from it and write to it as you use them.</p>
         </details>
         <details class="faq-item fold">
           <summary>Will it ever fabricate or embellish my experience?</summary>
@@ -1247,7 +1247,7 @@
         </details>
         <details class="faq-item fold">
           <summary>What does it cost?</summary>
-          <p>Free — every tool, no tiers. You need a Claude account; code execution on, any plan. Chrome extension needs a paid plan. If it gets you somewhere, there’s a tip option in the section above.</p>
+          <p>Free — every tool, no tiers. Full automation needs Cowork or Claude Code — free plan works for both. Plain claude.ai chat can’t run the skill (no persistent folder or shell). Chrome extension needs a paid plan. If it gets you somewhere, there’s a tip option in the section above.</p>
         </details>
       </div>
     </div>

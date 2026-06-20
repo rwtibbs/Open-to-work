@@ -1293,6 +1293,7 @@
     if (bm) {
       var bmLabel = bm.textContent;
       bm.addEventListener("click", function () {
+        clEvent("bookmark");
         var isMobile = window.matchMedia("(pointer: coarse)").matches;
         if (isMobile && navigator.share) {
           navigator.share({ title: document.title, url: window.location.href }).catch(function () {});
@@ -1309,6 +1310,7 @@
     if (sh) {
       var shLabel = sh.textContent;
       sh.addEventListener("click", function () {
+        clEvent("share");
         var url = window.location.href;
         if (navigator.share) {
           navigator.share({ title: document.title, url: url }).catch(function () {});
@@ -1331,7 +1333,7 @@
       document.getElementById(tab.getAttribute("aria-controls")).classList.add("is-active");
     }
     promptTabs.forEach(function (tab, i) {
-      tab.addEventListener("click", function () { activatePromptTab(tab); });
+      tab.addEventListener("click", function () { activatePromptTab(tab); clEvent("prompt_tab_" + tab.textContent.trim()); });
       tab.addEventListener("keydown", function (e) {
         var next;
         if (e.key === "ArrowRight") next = promptTabs[(i + 1) % promptTabs.length];
@@ -1342,6 +1344,8 @@
     document.querySelectorAll(".prompt-copy").forEach(function (copyBtn) {
       copyBtn.addEventListener("click", function () {
         var text = copyBtn.closest(".prompt-row").querySelector(".prompt-text").textContent.trim();
+        var activeTab = document.querySelector(".prompt-tab[aria-selected='true']");
+        clEvent("prompt_copy_" + (activeTab ? activeTab.textContent.trim() : ""));
         navigator.clipboard.writeText(text).then(function () {
           copyBtn.textContent = "Copied";
           setTimeout(function () { copyBtn.textContent = "Copy"; }, 1600);
@@ -1354,12 +1358,44 @@
     var cmd = document.getElementById("install-cmd");
     if (btn && cmd) {
       btn.addEventListener("click", function () {
+        clEvent("install_cmd_copy");
         navigator.clipboard.writeText(cmd.textContent.trim()).then(function () {
           btn.textContent = "Copied";
           setTimeout(function () { btn.textContent = "Copy"; }, 1600);
         });
       });
     }
+
+    // clarity event helper
+    function clEvent(name) { if (window.clarity) clarity("event", name); }
+
+    // hero install CTA
+    var heroCta = document.querySelector(".hero-ctas .btn-primary");
+    if (heroCta) heroCta.addEventListener("click", function () { clEvent("install_cta"); });
+
+    // github links (header, hero, get-started, footer)
+    document.querySelectorAll('a[href*="github.com/rwtibbs"]').forEach(function (el) {
+      el.addEventListener("click", function () { clEvent("github"); });
+    });
+
+    // download skill file
+    var dlBtn = document.querySelector('a[download]');
+    if (dlBtn) dlBtn.addEventListener("click", function () { clEvent("skill_download"); });
+
+    // ko-fi tip buttons
+    document.querySelectorAll(".jar-buttons a").forEach(function (el) {
+      el.addEventListener("click", function () { clEvent("tip_" + el.textContent.trim()); });
+    });
+
+    // walkthrough accordion
+    var wt = document.querySelector(".walkthrough");
+    if (wt) wt.addEventListener("toggle", function () { if (wt.open) clEvent("walkthrough_open"); });
+
+    // faq accordions
+    document.querySelectorAll(".faq-item").forEach(function (el) {
+      el.addEventListener("toggle", function () { if (el.open) clEvent("faq_open"); });
+    });
+
   })();
 </script>
 

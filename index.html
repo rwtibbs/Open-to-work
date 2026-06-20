@@ -228,7 +228,6 @@
   h2 em {
     font-style: italic;
     font-weight: 800;
-    color: var(--accent);
   }
 
   /* ---------- the loop ---------- */
@@ -788,6 +787,47 @@
   }
   footer a:hover { color: var(--text); }
 
+  /* ---------- grain texture ---------- */
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.038;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 380px 380px;
+  }
+
+  /* ---------- section watermarks ---------- */
+
+  #the-loop,
+  #the-tools,
+  #the-library,
+  #how-it-works {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .section-bg-num {
+    position: absolute;
+    right: -0.04em;
+    top: 0.5em;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(140px, 26vw, 400px);
+    line-height: 0.82;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.048;
+    pointer-events: none;
+    user-select: none;
+    z-index: -1;
+  }
+
   /* ---------- motion ---------- */
 
   .fade-up {
@@ -885,6 +925,7 @@
 
   <!-- 2a · the loop -->
   <section id="the-loop" aria-label="The loop">
+    <span class="section-bg-num" aria-hidden="true">01</span>
     <div class="wrap">
       <p class="kicker" data-reveal>01 / The loop</p>
       <h2 data-reveal>Runs itself. Stops at <em>send.</em></h2>
@@ -897,6 +938,7 @@
 
   <!-- 2b · the four tools -->
   <section id="the-tools" aria-label="The four tools">
+    <span class="section-bg-num" aria-hidden="true">02</span>
     <div class="wrap">
       <p class="kicker" data-reveal>02 / The tools</p>
       <h2 data-reveal>One loop. <em>Four</em> tools.</h2>
@@ -1056,6 +1098,7 @@
 
   <!-- 2c · one shared library -->
   <section id="the-library" aria-label="One shared library">
+    <span class="section-bg-num" aria-hidden="true">03</span>
     <div class="wrap">
       <p class="kicker" data-reveal>03 / One shared library</p>
       <h2 data-reveal>One <em>library.</em></h2>
@@ -1072,6 +1115,7 @@
 
   <!-- 4 · how it works -->
   <section id="how-it-works" aria-label="How it works">
+    <span class="section-bg-num" aria-hidden="true">04</span>
     <div class="wrap">
       <p class="kicker" data-reveal>04 / How it works</p>
       <h2 data-reveal>Onboard <em>once.</em></h2>

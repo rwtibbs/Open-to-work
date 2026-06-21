@@ -348,7 +348,35 @@ Want to do that now?"* If they install it, confirm it connects. If they skip it,
 that LinkedIn/Wellfound won't be scanned and applications will be hand-off-to-them
 rather than auto-filled — and that they can add it anytime.
 
-**A3d — Set the library-enrichment mode (quick, one question).** Explain in a line
+**A3d — Set up interview recording (offer it; apply the consent logic).** The debrief
+step — which turns every real interview into sharper prep — requires a written transcript.
+Setting up a transcription tool now means the user is ready to capture from interview one.
+
+**Before recommending, check consent tier from `profile.json → location` (or ask):**
+
+- **Location known, one-party consent state** (not CA, CT, FL, IL, MD, MA, MI, MT, NH,
+  OR, PA, WA — most states fall here, including CO and the majority of the US): recommend
+  Meetily directly. It's free, open-source, runs and transcribes locally (no audio leaves
+  the device, no bot joins the call), and exports clean plain text. Walk them to it: *"I'd
+  recommend setting up Meetily for recording interviews — it's free, totally local, and
+  makes the debrief possible. Want to do that now?"*
+- **Location known, two-party consent state** (CA, CT, FL, IL, MD, MA, MI, MT, NH, OR,
+  PA, WA — or equivalent in another country): almost never raise this unprompted. If the
+  topic comes up, surface it once with the caveat first and leave it: *"Quick note:
+  [state] requires all parties to consent to a recording. If you disclose it at the start
+  of the call and get agreement, Meetily is a good free option — but that disclosure is
+  on you."* Don't push; don't repeat.
+- **Location unknown**: ask before recommending — *"One useful thing to set up is a
+  transcription tool for debriefing interviews later. What state (or country) are you
+  in? That affects whether recording is fair game or requires disclosing it to the
+  other party."* Once they answer, apply the appropriate path above.
+
+Save the tool name (e.g. `"meetily"`) or `null` if they skip, and the derived
+`consent_tier` (`"one_party"`, `"two_party"`, or `null`) to
+`profile.json → interview_recording`. These fields drive the prep-session close-out
+reminder and the debrief consent note.
+
+**A3e — Set the library-enrichment mode (quick, one question).** Explain in a line
 that the kit keeps their library improving over time — when a real metric, story, or
 preference surfaces during a run, it can save it so every future application and prep
 gets sharper. Ask how they want that handled and write it to `profile.json →
@@ -699,6 +727,26 @@ vs. silent), recording only what they actually said. If the library was thin whe
 mattered — a sparse story bank, no failure story, gaps with no prepared framing — name
 it so `fact-pack.md` is stronger before the next round.
 
+**Recording reminder — one line, at the natural close.** At the end of the prep kit
+delivery or the mock wrap — whichever is the last substantive exchange — add a brief
+note based on `profile.json → interview_recording`:
+
+- **Tool is set** (e.g. `"meetily"`) → always include a one-liner: *"Don't forget to
+  start [tool] before the call."* One sentence, nothing more.
+- **Tool is null, consent_tier `one_party`** → offer once if it fits: *"If you haven't
+  set up a transcription tool, it's worth doing before this one — makes the debrief
+  possible. Meetily is free."* Skip if they've declined before.
+- **Tool is null, consent_tier `two_party`** → omit the reminder entirely. If they ask
+  about recording, surface the all-party-consent caveat once and leave it with them.
+- **Tool is null, consent_tier null** → one sentence at most: *"If you're in a
+  one-party-consent state, Meetily is free and worth setting up before the call."*
+  Don't ask the location question here — that belongs in setup (A3d), not a close-out.
+
+Keep this minimal: the user is heading into an interview, not starting a new task. If
+the session ended without a clear closing signal (the user just stopped responding),
+the natural injection point was the last substantive message you sent — the kit
+delivery or mock wrap — so it should have been included there.
+
 ## Step P5 — Debrief the real interview (after it happens)
 
 Prep gets the user ready; the **debrief** is how the kit learns from how it actually
@@ -716,11 +764,14 @@ debrief — say that plainly and point them at the capture setup for next time (
 
 When the user has a transcript:
 
-1. **Quick consent note (once).** The speakerphone capture path records the other
-   party's voice. Most places are one-party consent, but ~a dozen states (and some
-   countries) require all-party consent. Remind the user it's on them to have had the
-   legal basis to record; the kit doesn't police it, but flags it so they're not
-   blindsided. (Don't moralize — one line.)
+1. **Consent note (once, tiered).** Apply the same logic as A3d: check
+   `profile.json → interview_recording.consent_tier`. For `one_party`, a brief
+   "on you to have had the legal basis" line is enough, said once. For `two_party`,
+   it matters more — ask plainly whether they disclosed the recording before it started,
+   then proceed regardless of the answer (don't withhold the debrief, but make sure
+   they know). For `null`, surface the question: "Was this recorded in a state where
+   only your consent is needed, or do all parties need to agree?" Then save the tier.
+   Don't moralize; don't repeat.
 2. **Synthesize against the prep kit**, per `references/interview-prep.md`: which
    predicted questions actually came up (and which the prep missed), how each answer
    landed, where they reached for the right story vs. fumbled, which gaps got probed

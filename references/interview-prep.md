@@ -185,15 +185,46 @@ manual transcription. What matters is fidelity to what was actually said, not th
 speaker labels help but aren't required. The user pastes the text in (or saves it to a
 file).
 
-## Capturing the transcript with Meetily (recommended — free, discreet, local)
+## Consent tier — check this before recommending recording
 
-Meetily is the **recommended** capture tool when the user doesn't already have one: a
-free, open-source (MIT) notetaker that records and transcribes **locally on the user's
-own machine** with Whisper/Parakeet — no bot joins the call, no audio leaves the device,
-no account required. It's recommended because it's discreet (nothing shows up on the
-interviewer's end) and private (the transcript is the user's alone) — but it's a
-suggestion, not a requirement; any source above is fine. Two capture modes depending on
-how the interview happens:
+Recording a call captures the other party's voice. Whether the user needs the other
+party's consent depends on where the recording takes place. Check
+`profile.json → interview_recording.consent_tier` before surfacing any recording
+recommendation:
+
+- **`one_party`** — only the user's own consent is required (most US states, including
+  CO). Recommend Meetily freely; the caveat is a single line the first time, then drop
+  it.
+- **`two_party`** — all parties must consent before recording begins. States in this
+  category include CA, CT, FL, IL, MD, MA, MI, MT, NH, OR, PA, WA (and equivalents
+  elsewhere — verify locally). **Almost never raise recording unprompted** when this
+  tier is set. If the user brings it up or asks, surface the caveat first and leave
+  the choice entirely with them: *"[State] requires all parties to consent before you
+  record. If you disclose at the start of the call and get agreement, a tool like
+  Meetily works well — but that disclosure is yours to make."* Do not push or repeat.
+- **`null` (unknown)** — ask before recommending. One question: *"What state (or
+  country) are you recording in? That affects whether you can record without disclosing
+  it."* Once they answer, apply the appropriate tier above and save `consent_tier` to
+  `profile.json → interview_recording.consent_tier`.
+
+This is the user's legal call to make, not the kit's — flag it; don't police it.
+Don't refuse to process a transcript the user brings regardless of tier.
+
+## Capturing the transcript — Meetily and alternatives
+
+**Any accurate plain-text transcript works** — Meetily (recommended for one-party
+users below), Otter, Fathom, the call platform's own captions (Zoom / Google Meet /
+Teams export), or a clean manual transcription. Speaker labels help but aren't
+required. The user pastes the text in (or saves it to a file and references the path).
+
+### Meetily (recommended for one-party-consent users — free, discreet, local)
+
+When `consent_tier` is `one_party` and the user doesn't already have a tool set up,
+recommend Meetily: a free, open-source (MIT) notetaker that records and transcribes
+**locally on the user's own machine** with Whisper/Parakeet — no bot joins the call,
+no audio leaves the device, no account required. It's recommended because it's discreet
+(nothing shows up on the interviewer's end) and private (transcript stays on the user's
+machine). Two capture modes:
 
 - **Video call (Zoom / Google Meet / Teams):** Meetily taps **system audio**, so both
   the user and the interviewer come through cleanly from the same stream that reaches
@@ -201,24 +232,14 @@ how the interview happens:
 - **Phone call:** a phone call's audio doesn't route through the computer, so put the
   call on **speakerphone** and let Meetily capture it through the laptop **mic**. The
   user's voice is clean; the interviewer's voice is whatever the phone speaker plays
-  into the room. Practical tips to make the transcript usable: quiet room, phone volume
-  up, phone close to the laptop mic, and **run a 60-second test recording beforehand**
-  to confirm the speaker side transcribes legibly. Whisper handles speakerphone audio
-  reasonably but is more sensitive to a noisy room or tinny speaker than a direct
-  stream.
+  into the room. Practical tips: quiet room, phone volume up, phone close to the laptop
+  mic, and **run a 60-second test recording beforehand** to confirm the speaker side
+  transcribes legibly. Whisper handles speakerphone audio reasonably but is more
+  sensitive to a noisy room than a direct stream.
 
 Either way the user exports the transcript as plain text and pastes it into the chat.
-Nothing is uploaded anywhere.
-
-## Consent — flag it, don't police it
-
-Recording a call captures the other party's voice. Most US states (and many countries)
-are **one-party consent**, but roughly a dozen states require **all-party consent**,
-where the user would need to have disclosed the recording. This is the user's legal
-call to make, not the kit's — but surface it in one line the first time a debrief comes
-up (or when they ask about capturing one), so they're not blindsided. Don't lecture, and
-don't refuse to process a transcript the user brings — just make sure they know the rule
-exists. The speakerphone path captures the interviewer, so the caveat applies there too.
+Nothing is uploaded anywhere. When `consent_tier` is `two_party`, skip this
+recommendation unless the user explicitly asks; apply the caveat above first.
 
 ## Running the debrief
 

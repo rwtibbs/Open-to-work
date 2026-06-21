@@ -46,5 +46,11 @@
   "library_enrichment": {
     "_comment": "How the kit handles new true facts about you that surface during a run (a real metric you mention, a story not yet in the fact pack, a refined role preference). 'confirm' (default) asks before saving anything. 'silent' lets the kit auto-save clearly-true additions without asking, and only checks in on ambiguous ones. Either way it NEVER invents or infers a fact you didn't actually state.",
     "mode": "confirm"
+  },
+
+  "interview_recording": {
+    "_comment": "Tool you use to transcribe interviews for the debrief step. Set tool to the app name (e.g. 'meetily', 'otter', 'fathom', 'zoom') or null if not set up. consent_tier is derived from your recording location: 'one_party' means only your own consent is required (most US states); 'two_party' means all parties must consent before recording (CA, CT, FL, IL, MD, MA, MI, MT, NH, OR, PA, WA and others — verify for your jurisdiction). Onboarding sets both fields; update if you move or change tools.",
+    "tool": null,
+    "consent_tier": null
   }
 }

@@ -47,18 +47,34 @@ run aren't re-parsed.
    `{source}__{label}.json`. Skip any source that fails to fetch; the run continues
    without it.
 
-   **Browser pass (recommended — this is how LinkedIn + Wellfound get included).**
-   LinkedIn and Wellfound have no keyless API, so the *only* way to scan them is a
+   **Resilience rules (Change 3).** If a source fails to fetch, times out, returns
+   non-JSON, or is blocked: log it and skip it — never route aggregator JSON through
+   the browser/JS-eval as a fallback. The browser pass (LinkedIn/Wellfound/Built In)
+   is the primary pass; API aggregators are a best-effort bonus. The scanner writes
+   incremental `phases/` artifacts after each stage (normalized rows per source, scored
+   candidates, deep-read queue, final digest), so a mid-run drop is recoverable from
+   the last completed phase rather than losing the whole run.
+
+   **Browser pass (recommended — this is how LinkedIn, Wellfound, and Built In get
+   included).** These boards have no keyless API, so the *only* way to scan them is a
    logged-in browser pass using the **Claude for Chrome extension** and the user's
    signed-in session. When the extension is set up, run this pass: open each site's
-   role search in its own tab, **capture deep** (scroll and re-read 8–10×, don't stop
-   at the first screen — a single read returns only the top few), keep genuine
-   matches, and save them as `fetched/linkedin__<label>.json` /
-   `fetched/wellfound__<label>.json` in the simple shape
-   `[{title, company, location, url, description?, comp_text?}]`. The script picks up
-   any extra `{source}__{label}.json` files in `--input-dir` and scores them through
-   the exact same pipeline. If the extension isn't installed or Chrome isn't awake,
-   skip this pass and note it — the scan continues with the API sources.
+   role search in its own tab (**track every tab ID you open**), **capture deep**
+   (scroll and re-read 8–10×, don't stop at the first screen — a single read returns
+   only the top few), keep genuine matches, and save them as JSON arrays of
+   `{title, company, location, url, description?, comp_text?}`:
+   - `fetched/linkedin__<label>.json`
+   - `fetched/wellfound__<label>.json`
+   - `fetched/builtin__<label>.json` (national/remote: `https://builtin.com/jobs/remote/<category>?search=<role>`)
+   - `fetched/builtin-<region>__<label>.json` (metro — **optional, for tech users targeting a metro**): `https://builtin.com/jobs/<region>/<category>?search=<role>` (e.g. region `colorado`, `nyc`, `chicago`). Only add if the user targets a specific metro; otherwise skip.
+
+   **Built In is tech/startup-oriented** — include it when the user's field is tech;
+   non-tech users can omit it. Let the page load fully before capturing (it's
+   JS-rendered). The script picks up any extra `{source}__{label}.json` files in
+   `--input-dir` and scores them through the exact same pipeline.
+
+   If the extension isn't installed or Chrome isn't awake, skip this pass and note
+   it — the scan continues with the API sources.
 
 ### Stage 1 — card-level score (every role)
 
@@ -108,6 +124,16 @@ run aren't re-parsed.
    Newly surfaced postings are recorded in `seen_postings.json` so they don't reappear
    on the next run — each scan shows only what's genuinely new.
 
+### Tab cleanup (Change 2)
+
+7. **Close every tab opened this run.** After delivering the digest, close all browser
+   tabs that were opened during this scan — the search tabs (LinkedIn, Wellfound,
+   Built In) and any JD tabs opened for Stage-2 deep-read — using `tabs_close_mcp`.
+   Track every tab ID at open time (when you call the browser tool to open a tab,
+   save the returned tab ID). Only close tabs this run opened; leave the user's own
+   tabs and any application tabs untouched. If a `tabs_close_mcp` call fails, note
+   the failed tab ID but do not let it block the run.
+
 From there the user can pick a posting and say "tailor my resume for this" to drop
 straight into the RUN pipeline. That closes the loop: **scan → shortlist →
 (deep-read) → tailor → ATS → cover letter + answers → browser fill/upload.**
@@ -127,14 +153,27 @@ straight into the RUN pipeline. That closes the loop: **scan → shortlist →
   normalizer in `job_scanner.py` — straightforward to add (see the `NORMALIZERS`
   dict), but not included.
 
-## LinkedIn / Wellfound / Indeed — via the browser pass, not an API
+## LinkedIn / Wellfound / Built In / Indeed — via the browser pass, not an API
 
-**LinkedIn, Wellfound (AngelList), and Indeed** have no clean, key-free public JSON
-API and actively block scripted access (auth walls, bot detection, ToS limits), so
-they can't be reached by the keyless aggregator path. The way to include them is the
-**logged-in browser pass** above (Claude for Chrome + the user's session) — which the
-scheduled-task template runs for **LinkedIn and Wellfound** by default. Indeed is the
-most aggressively bot-protected of the three and isn't included by default, but a
-browser pass for it can be added the same way. If the user hasn't set up the Chrome
-extension, these sources are simply skipped and the scan falls back to the keyless
-aggregators — prompt them to add it (Step A3c) to unlock LinkedIn + Wellfound.
+**LinkedIn, Wellfound (AngelList), Built In, and Indeed** have no clean, key-free
+public JSON API and actively block scripted access (auth walls, bot detection, ToS
+limits), so they can't be reached by the keyless aggregator path. The way to include
+them is the **logged-in browser pass** above (Claude for Chrome + the user's session)
+— which the scheduled-task template runs for **LinkedIn, Wellfound, and Built In**
+(for tech-field users) by default. Indeed is the most aggressively bot-protected of
+the group and isn't included by default, but a browser pass for it can be added the
+same way. If the user hasn't set up the Chrome extension, these sources are simply
+skipped and the scan falls back to the keyless aggregators — prompt them to add it
+(Step A3c) to unlock the browser-pass boards.
+
+**Built In** is a strong board specifically for **tech/startup roles**, with good
+national-remote coverage and optional metro-specific pages. It belongs in the browser
+pass because it's JavaScript-rendered. For non-tech fields (healthcare, education,
+legal, etc.) Built In has little coverage, so omit it and rely on the API aggregators
+and other browser-pass boards. When adding Built In:
+- National/remote URL pattern: `https://builtin.com/jobs/remote/<category>?search=<role>`
+- Metro URL pattern: `https://builtin.com/jobs/<region>/<category>?search=<role>`
+  Common region slugs: `colorado`, `nyc`, `chicago`, `los-angeles`, `boston`,
+  `seattle`, `austin`, `san-francisco`, `washington-dc`
+- Save to `fetched/builtin__<label>.json` (national) and/or
+  `fetched/builtin-<region>__<label>.json` (metro)

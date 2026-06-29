@@ -1,6 +1,8 @@
 {
   "_comment": "Job scanner config TEMPLATE. Copy to user-library/scanner_config.json and fill in your own criteria during onboarding. TWO source kinds: (1) discovery_sources = BROAD market discovery across keyless remote-job aggregators (surfaces roles at companies you never pre-listed); (2) an OPTIONAL per-company ATS watchlist ('always also check these'). The 'criteria' block is the shared scoring/filtering brain. EVERYTHING below is an EXAMPLE with sensible defaults — the tier/keyword/watchlist lists are examples, NOT a fixed whitelist; trim or extend freely. No personal data is baked into the script; it all lives here.",
 
+  "_browser_pass_note": "BROWSER-PASS SOURCES (LinkedIn, Wellfound, Built In) are NOT configured here — they run as a manual browser pass in the scheduled task and are saved as fetched/{source}__{label}.json files. Built In (builtin.com) is a tech/startup board: include it when your field is tech; skip it for non-tech. URL patterns: national-remote = https://builtin.com/jobs/remote/<category>?search=<role>; metro = https://builtin.com/jobs/<region>/<category>?search=<role> (region slugs: colorado, nyc, chicago, los-angeles, seattle, austin, boston, san-francisco, washington-dc). Save to fetched/builtin__<label>.json and/or fetched/builtin-<region>__<label>.json. All builtin* files are picked up automatically by the scanner.",
+
   "discovery_sources": {
     "remotive": {
       "enabled": true,

@@ -42,6 +42,23 @@ PATHS — default to the script's own directory, override with flags or env:
   --shortlist <path>  shortlist_latest.json  (env JOB_SCANNER_SHORTLIST)
 Point these at your user-library/ so config and state live with your data.
 
+INCREMENTAL PERSISTENCE (Change 3)
+  On every run the script writes intermediate artifacts to a phases/ subdirectory
+  (next to shortlist_latest.json) so a mid-run connection drop loses nothing:
+    phases/normalized_<source>_<label>.json   — rows per source after normalizing
+    phases/scored_candidates.json             — all survivors after card-level score
+    phases/deep_read_queue.json               — roles flagged for Stage-2 deep-read
+  The final shortlist_latest.json is written at the end as before.
+  Missing source files in --input-dir mode are skipped gracefully (no crash).
+  HARD RULE: aggregator JSON is NEVER routed through the browser/JS-eval as a
+  fallback. If a source fails, it is skipped; the browser pass is primary.
+
+BUILTIN SUPPORT (Change 1)
+  Built In (builtin.com) is a JS-rendered tech/startup board. The browser pass
+  saves results as fetched/builtin__<label>.json (national/remote) and/or
+  fetched/builtin-<region>__<label>.json (metro). All "builtin*" keys are
+  automatically routed through normalize_manual.
+
 USAGE
   python3 job_scanner.py --config user-library/scanner_config.json
   python3 job_scanner.py --print-urls --config user-library/scanner_config.json
@@ -577,6 +594,11 @@ NORMALIZERS = {
     # and saves them as fetched/{source}__{label}.json in the simple shape.
     "linkedin": normalize_manual,
     "wellfound": normalize_manual,
+    # Built In (builtin.com) — JS-rendered tech/startup board; browser pass only.
+    # Regional variants use "builtin-<region>" keys (e.g. "builtin-co", "builtin-nyc").
+    # Any key starting with "builtin" that isn't registered explicitly is picked up
+    # by the catch-all logic in run() and routed through normalize_manual below.
+    "builtin": normalize_manual,
     "manual": normalize_manual,
 }
 
@@ -892,6 +914,19 @@ def run(config_path, seen_path, shortlist_path, dry_run=False, input_dir=None):
     cap = criteria.get("result_cap", 8)
     deep_read_threshold = criteria.get("deep_read_threshold", 50)
 
+    # Incremental persistence: write phase artifacts next to shortlist_latest.json
+    # so a mid-run drop is recoverable. phases/ is created if it doesn't exist.
+    phases_dir = os.path.join(os.path.dirname(os.path.abspath(shortlist_path)), "phases")
+    os.makedirs(phases_dir, exist_ok=True)
+
+    def _write_phase(name, obj):
+        try:
+            path = os.path.join(phases_dir, name)
+            with open(path, "w", encoding="utf-8") as _fh:
+                json.dump(obj, _fh, indent=2)
+        except Exception as _e:
+            pass  # phase write failure must not abort the run
+
     seen = load_seen(seen_path)
     stats = {
         "sources_ok": [], "sources_failed": [],
@@ -908,16 +943,22 @@ def run(config_path, seen_path, shortlist_path, dry_run=False, input_dir=None):
     tasks = build_fetch_tasks(config)
 
     # In --input-dir mode, also pick up extra {source}__{label}.json files
-    # dropped in (notably an optional browser pass: linkedin/wellfound/manual).
+    # dropped in (browser pass: linkedin/wellfound/builtin/manual).
+    # "builtin-<region>" regional keys (e.g. "builtin-co") route through
+    # normalize_manual automatically — no explicit NORMALIZERS entry required.
     if input_dir and os.path.isdir(input_dir):
         existing = {t["filename"] for t in tasks}
         for fn in sorted(os.listdir(input_dir)):
             if not fn.endswith(".json") or "__" not in fn or fn in existing:
                 continue
             src = fn.split("__", 1)[0]
-            if src in NORMALIZERS:
+            # Accept exact NORMALIZERS keys AND any "builtin-*" regional variant.
+            normalizer_key = src if src in NORMALIZERS else (
+                "builtin" if src.startswith("builtin-") else None)
+            if normalizer_key:
                 lbl = fn[len(src) + 2:-5]
-                tasks.append({"source": src, "label": lbl, "filename": fn, "url": ""})
+                tasks.append({"source": src, "label": lbl, "filename": fn, "url": "",
+                               "_normalizer": normalizer_key})
 
     exclude_kw = [k.lower() for k in criteria.get("exclude_keywords", [])]
     # Word-boundary match so short keywords don't fire as substrings inside
@@ -949,18 +990,24 @@ def run(config_path, seen_path, shortlist_path, dry_run=False, input_dir=None):
         source = task["source"]
         label = task["label"]
         company_hint = task.get("company")
-        if source not in NORMALIZERS:
+        # _normalizer is set for builtin-* regional keys to route through "builtin"
+        normalizer_key = task.get("_normalizer", source)
+        if normalizer_key not in NORMALIZERS:
             stats["sources_failed"].append("{}/{} (unknown source)".format(source, label))
             continue
         try:
             payload = _load_task_payload(task, input_dir)
             arg = company_hint if company_hint else label
-            postings = NORMALIZERS[source](payload, arg)
+            postings = NORMALIZERS[normalizer_key](payload, arg)
             stats["sources_ok"].append("{}/{}: {} postings".format(source, label, len(postings)))
+            # Persist normalized rows for this source immediately (Change 3)
+            _write_phase("normalized_{}__{}.json".format(
+                re.sub(r"[^a-z0-9_-]", "-", source), re.sub(r"[^a-z0-9_-]", "-", label)),
+                postings)
         except FileNotFoundError:
             stats["sources_failed"].append("{}/{}: no input file".format(source, label))
             continue
-        except Exception as e:  # timeout / HTTP / parse — skip, keep going
+        except Exception as e:  # timeout / HTTP / parse — SKIP and continue (Change 3 hard rule)
             stats["sources_failed"].append("{}/{}: {}".format(source, label, str(e)[:80]))
             continue
 
@@ -1023,6 +1070,17 @@ def run(config_path, seen_path, shortlist_path, dry_run=False, input_dir=None):
             candidates.append(p)
 
     candidates.sort(key=lambda x: x["score"], reverse=True)
+    # Persist scored candidates and deep-read queue immediately (Change 3)
+    _write_phase("scored_candidates.json", [
+        {"title": p["title"], "company": p["company"], "score": p["score"],
+         "source": p.get("source"), "url": p.get("url"), "why": p.get("why")}
+        for p in candidates
+    ])
+    _write_phase("deep_read_queue.json", [
+        {"title": p["title"], "company": p["company"], "score": p["score"],
+         "url": p.get("url"), "source": p.get("source")}
+        for p in candidates if p["score"] > deep_read_threshold
+    ])
     shortlist = candidates[:cap]
 
     if shortlist and not dry_run:
@@ -1069,6 +1127,8 @@ def run(config_path, seen_path, shortlist_path, dry_run=False, input_dir=None):
     }
     with open(shortlist_path, "w", encoding="utf-8") as fh:
         json.dump(out, fh, indent=2)
+    # Also persist the final digest as a phase artifact (Change 3)
+    _write_phase("digest_latest.json", out)
 
     print(render_markdown(out))
     return out

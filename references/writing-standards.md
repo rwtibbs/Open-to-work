@@ -67,6 +67,25 @@ what it is, why it reads as AI, and the human move instead.
     the same length, a too-even rhythm. Real writing is lumpy. *Instead:* vary sentence
     length deliberately; break an expected triad to two or four.
 
+12. **Third-person / persona voice in a first-person document** — describing the user
+    from the outside, with bare third-person verb openers or a pronoun, as if writing
+    their bio. "Product designer with 10+ years… Designs end-to-end experiences…
+    Prototypes and ships… raises the bar for the teams around him." It reads as a dossier
+    about the person, not the person. In a résumé summary this is the single most common
+    tell. *Instead:* write it as the user speaking — "I'm a product designer; for 10
+    years I've…". First person, active, per `voice.md`. Any *he / she / him / her*
+    pointing at the user is the giveaway.
+
+13. **JD trait-mirroring** — echoing the posting's personality / "who you are" language
+    back at it, lightly reworded: "holds a point of view in a design critique,"
+    "pragmatic about where AI pays off," "comfortable being the senior IC," "it just
+    works," "keeps people in control." It makes the copy read as reverse-engineered for
+    one posting rather than a genuine fit. *Crucial distinction:* mirroring the JD's
+    **nouns/keywords** (tools, domain, methods — design systems, retrieval, evals, Figma
+    plugin) is good and helps ATS; mirroring its **adjectives/traits** is the tell.
+    *Instead:* say what is actually true about the user, in their words. Test: would they
+    write this line if they had never seen this posting? If not, cut it.
+
 ---
 
 ## The positive half — what makes prose read as human
@@ -99,6 +118,10 @@ flexes by context — this is the part a generic "avoid AI writing" rule gets wr
   fragment, and that's correct). The tells to police here are stacked parallel bullets
   that all open the same way and buzzword padding. Vary bullet openings; lead with the
   outcome.
+- **Résumé summary** — first person and in the user's voice ("I'm… / I've…"), never the
+  detached third-person persona register (tell #12) and never JD trait-mirroring (tell
+  #13). Echo the JD's **nouns** for ATS, not its **adjectives**. Lead with a concrete,
+  durable angle that stays true regardless of which posting it's aimed at.
 - **Cover letter** — flowing first-person prose. This is where tells #2, #3, #6, #7, and
   #9 most often creep in. Hold the cover-letter playbook's craft rules; this standard
   reinforces them.

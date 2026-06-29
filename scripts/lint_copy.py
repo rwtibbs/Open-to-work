@@ -15,6 +15,11 @@ Two modes:
                       openers, asyndeton, em-dash overuse, known AI-tell words).
                       Reads stdin if the file is "-".
 
+  summary <resume.md>  Check a tailored résumé's ## Summary reads first-person and
+                      isn't mirroring the JD's "who you are" trait language
+                      (the two résumé-summary tells, #12 and #13 in
+                      writing-standards.md). Reads stdin if the file is "-".
+
   parse <resume.pdf> [--expect STR ...]
                       ATS parse-safety: extract the PDF's text the way a parser
                       would (pdftotext, else pypdf) and confirm each --expect
@@ -27,6 +32,7 @@ choose to surface them) — but treat it as advisory either way.
 
 Usage:
     python3 scripts/lint_copy.py prose CoverLetter_Jane_Acme.md
+    python3 scripts/lint_copy.py summary resume_acme.md
     python3 scripts/lint_copy.py parse Resume_Jane_Acme.pdf --expect "Jane Doe" "EXPERIENCE" "SKILLS"
 """
 import argparse
@@ -80,6 +86,54 @@ def lint_prose(text):
     return sorted(findings, key=lambda f: f[0])
 
 
+# --- résumé summary voice checks (tells #12 third-person persona, #13 JD trait-mirroring) ---
+FIRST_PERSON = re.compile(r"\b(?:i|i'?m|i'?ve|i'?d|i'?ll|my|me|myself)\b", re.I)
+# gendered singular pronouns in a personal summary almost always point at the user
+SELF_THIRD_PERSON = re.compile(r"\b(?:he|him|his|she|her|hers)\b", re.I)
+# high-signal JD "who you are" trait echoes — advisory, conservative
+MIRROR_TELLS = [
+    r"holds? a point of view",
+    r"pragmatic about where ai pays off",
+    r"comfortable being (?:the|a) senior ic",
+    r"it just works",
+    r"keeps? (?:people|users|customers|you) in control",
+    r"raises? the bar for (?:the |everyone |those )?(?:team|teams|people|around)",
+    r"bias (?:for|toward) action",
+    r"high[ -]agency",
+    r"roll up (?:your|my|their) sleeves",
+]
+
+
+def extract_summary(md_text):
+    """Return the text of the ## Summary section (up to the next heading), or ''."""
+    m = re.search(r"(?im)^[ \t]*#{1,6}[ \t]*summary[ \t]*$(.*?)(?=^[ \t]*#{1,6}[ \t]|\Z)",
+                  md_text, re.S)
+    return m.group(1).strip() if m else ""
+
+
+def lint_summary(md_text):
+    findings = []
+    summary = extract_summary(md_text)
+    if not summary:
+        findings.append((0, "no '## Summary' section found — cannot check summary voice", ""))
+        return findings
+    flat = re.sub(r"\s+", " ", summary).strip()
+    if not FIRST_PERSON.search(summary):
+        findings.append((0, "summary is NOT first person — no 'I / I'm / I've / my' found; "
+                            "reads as third-person persona (tell #12). Rewrite as the user speaking.",
+                         flat[:70]))
+    for m in SELF_THIRD_PERSON.finditer(summary):
+        ln = summary.count("\n", 0, m.start()) + 1
+        findings.append((ln, "third-person pronoun in summary — if it refers to the user, "
+                             "switch to first person (tell #12)", m.group(0)))
+    for rx in MIRROR_TELLS:
+        for m in re.finditer(rx, summary, re.I):
+            ln = summary.count("\n", 0, m.start()) + 1
+            findings.append((ln, "possible JD trait-mirroring (tell #13) — would the user write "
+                                 "this without the posting?", re.sub(r"\s+", " ", m.group(0))))
+    return findings
+
+
 def extract_pdf_text(pdf_path):
     if shutil.which("pdftotext"):
         return subprocess.run(["pdftotext", "-layout", pdf_path, "-"],
@@ -126,6 +180,8 @@ if __name__ == "__main__":
     sub = ap.add_subparsers(dest="mode", required=True)
     pp = sub.add_parser("prose", help="scan a prose file for structural AI tells")
     pp.add_argument("file", help="markdown/text file, or - for stdin")
+    ps = sub.add_parser("summary", help="check a résumé summary's voice (first-person, no JD trait-mirroring)")
+    ps.add_argument("file", help="resume_<company>.md file, or - for stdin")
     pa = sub.add_parser("parse", help="ATS parse-safety check on a resume PDF")
     pa.add_argument("pdf")
     pa.add_argument("--expect", nargs="*", default=[],
@@ -135,5 +191,8 @@ if __name__ == "__main__":
     if args.mode == "prose":
         text = sys.stdin.read() if args.file == "-" else open(args.file, encoding="utf-8").read()
         sys.exit(report(lint_prose(text), "tells"))
+    elif args.mode == "summary":
+        text = sys.stdin.read() if args.file == "-" else open(args.file, encoding="utf-8").read()
+        sys.exit(report(lint_summary(text), "summary issues"))
     else:
         sys.exit(report(lint_parse(args.pdf, args.expect), "parse issues"))

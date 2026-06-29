@@ -451,7 +451,7 @@ edit the base; it must stay clean for the next role.
 
 Tailor through the levers the format supports: the **title** line (highest-impact
 single change — match the role's language), the **summary** (lead with the most
-relevant angle), **experience** lines (reorder and reword for keyword alignment,
+relevant angle — always in first person; see the two hard rules below), **experience** lines (reorder and reword for keyword alignment,
 never invent), **skills** (reorder so JD-relevant terms lead), and **projects**
 (reorder/lightly reword). Keep the section order and density of the base.
 
@@ -460,6 +460,23 @@ When rewording any prose — the summary especially, and bullet phrasing — fol
 and metric-led (a bullet is allowed to be a fragment), but avoid the résumé-specific
 tells — every bullet opening the same way, buzzword padding, and a summary written in
 abstract "results-driven professional" AI-speak. Lead with concrete outcomes.
+
+**The summary is first-person and yours — two hard rules.** *(1) Voice.* Write it as the
+user actually talks — first person ("I'm a product designer; for 10 years I've…"), never
+the detached third-person/persona register ("Product designer with 10+ years…", "Designs
+end-to-end experiences…", "Prototypes and ships…", "raises the bar for the teams around
+him"). Bare third-person verb openers and any *he/she/him/her* pointing at the user are
+the tell — the summary should read as genuinely the user, not a dossier about them.
+`voice.md` governs the exact register. *(2) No trait-mirroring.* Echoing the JD's
+**nouns/keywords** (design systems, MCP, retrieval, evals, Figma plugin, the domain) is
+correct and good for ATS — do it. Echoing the JD's **adjectives / behavioral / "who you
+are" trait language** ("holds a point of view in a critique", "pragmatic about where AI
+pays off", "comfortable being the senior IC", "it just works", "keeps people in control")
+lightly reworded is the tell — it makes the résumé read as reverse-engineered for one
+posting. The test for every summary line: *would the user write this sentence if they had
+never seen this posting?* If it exists only because the JD said it, cut it or rewrite it
+to something true and durable. (Run `lint_copy.py summary resume_<company>.md` to catch
+the mechanical version of both.)
 
 ### Step 2 — Build the DOCX (deterministic)
 
@@ -500,6 +517,12 @@ reads it (catches a styled header — e.g. a logo table — scrambling extractio
 ```bash
 python3 <skill_dir>/scripts/lint_copy.py parse "<working>/Resume_<Name>_<Company>.pdf" \
   --expect "<Name>" "EXPERIENCE" "SKILLS"
+```
+
+**Summary voice check (advisory).** Confirm the summary reads as first-person and isn't
+mirroring the JD's trait language:
+```bash
+python3 <skill_dir>/scripts/lint_copy.py summary "<working>/resume_<company>.md"
 ```
 
 ### Step 5 — ATS loop, run it TWICE (judgment inside a fixed loop)
@@ -857,17 +880,45 @@ python3 <skill_dir>/scripts/job_scanner.py --config <working>/user-library/scann
 card pass: it scores every role 0–100 from the listing and flags `deep_read: true/false`
 against `deep_read_threshold` (default 50). The agent does **Stage 2** by hand only on
 flagged cards — open the JD, do a live-status check (drop 404s / "no longer accepting"),
-extract real comp + scope, re-score, and for a profile-only find (Wellfound/LinkedIn)
+extract real comp + scope, re-score, and for a profile-only find (Wellfound/LinkedIn/Built In)
 search for the canonical ATS "Apply at" link. Scoring is calibrated so domain is
 non-exhaustive (an unlisted domain is neutral; only `exclude_keywords` drop a role) and
 role-shape/baseline can carry a well-shaped role over the bar with no domain match.
 
 **Scheduled & unattended runs** can't use bash networking, so the agent web-fetches each
-source. Full procedure, the LinkedIn/Wellfound logged-in browser pass, and the ready-made
+source. Full procedure, the browser pass (LinkedIn, Wellfound, Built In), and the ready-made
 scheduled-task prompt are in **`references/scheduling.md`** and
 **`references/scanner-scheduled-task.template.md`** — default cadence twice daily
 (~8am/4pm local). Postings dedupe via `seen_postings.json` so nothing repeats. From a
 shortlisted role the user drops into **RUN**.
+
+**Built In (tech/startup users).** builtin.com is a strong board for tech/startup roles
+with good national-remote and metro coverage. It's JavaScript-rendered (no clean public
+API), so it runs in the **browser pass** alongside LinkedIn/Wellfound — NOT the API
+aggregator pass. Tech-field users should include it; non-tech users can skip it. See
+`references/scheduling.md` for the URL pattern and save format. The script picks up
+`fetched/builtin__<label>.json` and `fetched/builtin-<region>__<label>.json` files
+automatically through the same pipeline as other browser sources.
+
+**Resilience — best-effort aggregators and incremental persistence (important).** The
+scanner is designed so a single failure doesn't wipe the run:
+- **Aggregator failures are skipped, not fatal.** If a source fails, times out, returns
+  non-JSON, or is blocked, it's logged in `sources_failed` and the run continues.
+  **HARD RULE: never route aggregator JSON through the browser/JS-eval as a fallback.**
+  The browser pass over the user's boards is primary; aggregators are a best-effort bonus.
+- **Incremental persistence.** The script writes intermediate artifacts to a `phases/`
+  directory (next to `shortlist_latest.json`) as each stage completes:
+  `phases/normalized_<source>__<label>.json` (rows per source), `phases/scored_candidates.json`
+  (all survivors after card scoring), `phases/deep_read_queue.json` (roles flagged for Stage 2),
+  and `phases/digest_latest.json` (the final shortlist). A mid-run connection drop is
+  recoverable from whatever phase completed last, rather than losing the whole run.
+- **Deep-read stays scoped.** Stage 2 covers ONLY roles above `deep_read_threshold`. As
+  the tracker grows, per-run weight stays bounded.
+
+**Tab cleanup (browser pass).** After delivering the digest, close every tab the browser
+pass opened this run (search tabs + JD deep-read tabs) using `tabs_close_mcp`. Track tab
+IDs as you open them; only close tabs opened this run. A failed close is noted but must
+not block the run. Leave the user's own tabs untouched.
 
 **Scan reactions are preference signal — feed them back.** When the user reacts to a
 shortlist ("not interested in crypto," "more founding roles," "too junior"), offer to
@@ -900,13 +951,16 @@ pull mechanics back into prose (you'll reinvent them under time pressure).
   yours.
 - `scripts/job_scanner.py` — config-driven scanner: broad discovery across keyless
   remote-job aggregators (Remotive/RemoteOK/Arbeitnow/Jobicy, Adzuna optional) plus
-  an optional Greenhouse/Lever/Ashby watchlist. Card-level (Stage 1) scoring with a
-  recency gate, non-exhaustive domain tiers, role-shape signals + baseline, and a
-  `deep_read` flag per result. `--print-urls` and `--input-dir` support the
-  unattended web-fetch flow.
+  an optional Greenhouse/Lever/Ashby watchlist, plus browser-pass sources (LinkedIn,
+  Wellfound, **Built In**, manual). Card-level (Stage 1) scoring with a recency gate,
+  non-exhaustive domain tiers, role-shape signals + baseline, and a `deep_read` flag
+  per result. `--print-urls` and `--input-dir` support the unattended web-fetch flow.
+  Incremental persistence to `phases/` means a mid-run drop is recoverable. Aggregator
+  failures are skipped (never routed through the browser as a fallback).
 - `scripts/lint_copy.py` — advisory linter: `prose` flags the structural AI tells from
-  `writing-standards.md`; `parse` checks a resume PDF extracts cleanly for ATS parsing.
-  Surfaces issues for judgment; never rewrites.
+  `writing-standards.md`; `summary` flags a résumé summary that isn't first-person or
+  that mirrors the JD's trait language; `parse` checks a resume PDF extracts cleanly for
+  ATS parsing. Surfaces issues for judgment; never rewrites.
 - `scripts/selfcheck.py` — post-install/edit health check: compiles the scripts, reports
   dependencies (python-docx / LibreOffice / poppler / pypdf), and asserts the scanner's
   core logic (incl. the word-boundary exclude behavior) against a built-in fixture.
